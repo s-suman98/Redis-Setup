@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  redis-server:
+    image: redis:7
+    container_name: redis_server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: >
+      redis-server
+      --appendonly yes
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+
+  linux-client:
+    build: ./client
+    container_name: redis_client
+    depends_on:
+      - redis-server
+    ports:
+      - "2222:22"  # SSH port exposed
+    tty: true
+    stdin_open: true
+
+volumes:
+  redis_data:
